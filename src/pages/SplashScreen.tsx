@@ -45,7 +45,7 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
           />
         ))}
         <img
-          src={kangarooLogo}
+          src={kindiLogo}
           alt="Kindi"
           className="w-32 h-32 animate-kangaroo-bounce relative z-10"
         />
