@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import kindiLogo from '@/assets/kindi-logo.png';
+import kangarooLogo from '@/assets/kangaroo-logo.png';
 
 interface SplashScreenProps {
   onFinish: () => void;
