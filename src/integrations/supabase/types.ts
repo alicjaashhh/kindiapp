@@ -14,7 +14,147 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      babies: {
+        Row: {
+          birth_date: string
+          created_at: string
+          gender: string | null
+          height: number | null
+          id: string
+          name: string
+          parent_id: string
+          photo_url: string | null
+          weight: number | null
+        }
+        Insert: {
+          birth_date: string
+          created_at?: string
+          gender?: string | null
+          height?: number | null
+          id?: string
+          name: string
+          parent_id: string
+          photo_url?: string | null
+          weight?: number | null
+        }
+        Update: {
+          birth_date?: string
+          created_at?: string
+          gender?: string | null
+          height?: number | null
+          id?: string
+          name?: string
+          parent_id?: string
+          photo_url?: string | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "babies_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baby_events: {
+        Row: {
+          baby_id: string
+          created_at: string
+          details: Json | null
+          event_date: string
+          event_type: string
+          id: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          details?: Json | null
+          event_date?: string
+          event_type: string
+          id?: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          details?: Json | null
+          event_date?: string
+          event_type?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baby_events_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          last_login: string | null
+          region: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_login?: string | null
+          region?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_login?: string | null
+          region?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recommendations: {
+        Row: {
+          baby_id: string
+          created_at: string
+          date: string
+          id: string
+          recommendation_text: string
+          source: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          date?: string
+          id?: string
+          recommendation_text: string
+          source?: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          date?: string
+          id?: string
+          recommendation_text?: string
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendations_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
