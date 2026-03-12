@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '@/components/BottomNav';
 import FloatingAnimals from '@/components/FloatingAnimals';
-import kindiLogo from '@/assets/kindi-logo.png';
+import kangarooLogo from '@/assets/kangaroo-logo.png';
 
 const SPURT_WEEKS = [5, 8, 12, 19, 26, 37, 46, 55, 64, 75];
 
