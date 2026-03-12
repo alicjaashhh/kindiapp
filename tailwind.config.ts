@@ -12,8 +12,17 @@ export default {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      nunito: ['Nunito', 'sans-serif'],
+    },
     extend: {
       colors: {
+        kindi: {
+          yellow: '#FFB800',
+          orange: '#FFA500',
+          light: '#FFF9E6',
+          cream: '#FFF3CC',
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
