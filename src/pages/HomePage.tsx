@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '@/components/BottomNav';
 import FloatingAnimals from '@/components/FloatingAnimals';
-import kindiLogo from '@/assets/kindi-logo.png';
+import kangarooLogo from '@/assets/kangaroo-logo.png';
 
 const SPURT_WEEKS = [5, 8, 12, 19, 26, 37, 46, 55, 64, 75];
 
@@ -72,7 +72,7 @@ const HomePage = () => {
       {/* Header */}
       <div className="px-5 pt-5 pb-3 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
-          <img src={kindiLogo} alt="Kindi" className="w-10 h-10 rounded-full object-cover" />
+          <img src={kangarooLogo} alt="Kindi" className="w-10 h-10 rounded-full object-cover animate-kangaroo-bounce" />
           <div>
             <span className="font-bold text-lg text-foreground">{baby?.name || 'Малыш'}</span>
             <p className="text-xs text-muted-foreground">День {babyDays} • {babyWeeks} нед</p>
