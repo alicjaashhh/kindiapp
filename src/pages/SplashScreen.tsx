@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import kangarooLogo from '@/assets/kangaroo-logo.png';
+import kindiLogo from '@/assets/kindi-logo.png';
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -45,7 +45,7 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
           />
         ))}
         <img
-          src={kangarooLogo}
+          src={kindiLogo}
           alt="Kindi"
           className="w-32 h-32 animate-kangaroo-bounce relative z-10"
         />
