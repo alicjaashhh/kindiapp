@@ -1,11 +1,12 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { User, BarChart3, ShoppingBag, BookOpen } from 'lucide-react';
+import { Home, BarChart3, ShoppingBag, BookOpen, User } from 'lucide-react';
 
 const tabs = [
-  { icon: User, label: 'Аккаунт', id: 'account', path: '/account' },
+  { icon: Home, label: 'Главная', id: 'home', path: '/home' },
   { icon: BarChart3, label: 'Развитие', id: 'development', path: '/development' },
   { icon: ShoppingBag, label: 'Магазин', id: 'shop', path: '/shop' },
   { icon: BookOpen, label: 'Статьи', id: 'articles', path: '/articles' },
+  { icon: User, label: 'Аккаунт', id: 'account', path: '/account' },
 ];
 
 const BottomNav = () => {

@@ -72,7 +72,7 @@ const HomePage = () => {
       {/* Header */}
       <div className="px-5 pt-5 pb-3 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
-          <img src={kindiLogo} alt="Kindi" className="w-10 h-10 rounded-full object-cover" />
+          <img src={kangarooLogo} alt="Kindi" className="w-10 h-10 rounded-full object-cover animate-kangaroo-bounce" />
           <div>
             <span className="font-bold text-lg text-foreground">{baby?.name || 'Малыш'}</span>
             <p className="text-xs text-muted-foreground">День {babyDays} • {babyWeeks} нед</p>
