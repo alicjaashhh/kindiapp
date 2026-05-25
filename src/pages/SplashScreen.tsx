@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import kangarooLogo from '@/assets/kangaroo-logo.png';
+import kangarooLogo from '@/assets/kangaroo-splash.png';
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -16,11 +16,14 @@ const circles = [
 
 const SplashScreen = ({ onFinish }: SplashScreenProps) => {
   const [fadeOut, setFadeOut] = useState(false);
+  const [stopBounce, setStopBounce] = useState(false);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFadeOut(true), 2500);
-    const finishTimer = setTimeout(() => onFinish(), 3000);
+    const stopTimer = setTimeout(() => setStopBounce(true), 1800);
+    const fadeTimer = setTimeout(() => setFadeOut(true), 2700);
+    const finishTimer = setTimeout(() => onFinish(), 3200);
     return () => {
+      clearTimeout(stopTimer);
       clearTimeout(fadeTimer);
       clearTimeout(finishTimer);
     };
@@ -47,7 +50,7 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         <img
           src={kangarooLogo}
           alt="Kindi"
-          className="w-32 h-32 animate-kangaroo-bounce relative z-10"
+          className={`w-36 h-36 object-contain relative z-10 ${stopBounce ? '' : 'animate-kangaroo-bounce'}`}
         />
         <span className="mt-4 text-3xl font-extrabold tracking-wide relative z-10" style={{ color: '#5D4037' }}>
           KINDI
