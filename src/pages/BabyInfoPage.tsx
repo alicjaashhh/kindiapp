@@ -103,7 +103,7 @@ const BabyInfoPage = () => {
               </div>
             )}
           </button>
-          <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={onFile} className="hidden" />
+          <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
         </div>
 
         <div>
