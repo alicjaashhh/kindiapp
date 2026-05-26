@@ -59,7 +59,7 @@ const BabyInfoPage = () => {
         } catch (uploadErr: any) {
           console.error('Photo upload failed:', uploadErr);
           toast.error('Не удалось загрузить фото, продолжаем без него');
-          photo_url = photoPreview || null;
+          photo_url = null;
         }
       }
 
