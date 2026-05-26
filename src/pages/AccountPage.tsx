@@ -61,27 +61,27 @@ const AccountPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto">
-      <PageHeader title={lang === 'ru' ? 'Аккаунт' : 'Account'} showBack={false} />
+      <PageHeader title={t('account')} showBack={false} />
       <div className="px-5 pb-24 space-y-5">
         <div className="bg-card border border-border rounded-2xl p-4">
-          <h3 className="font-bold text-foreground mb-3">👤 {t.parent}</h3>
+          <h3 className="font-bold text-foreground mb-3">👤 {t('parentProfile')}</h3>
           <p className="text-sm text-muted-foreground">Email: <span className="text-foreground">{email || '—'}</span></p>
           <div className="mt-3">
-            <p className="text-sm font-medium mb-2">{t.region}</p>
+            <p className="text-sm font-medium mb-2">{t('region')}</p>
             <div className="flex gap-2">
               {[{ k: 'cis', l: 'СНГ' }, { k: 'europe', l: 'Europe' }, { k: 'usa', l: 'USA' }].map(r => (
                 <button key={r.k} onClick={() => handleRegionChange(r.k)} className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${region === r.k ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>{r.l}</button>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground mt-2">{t.language}: {lang === 'ru' ? 'Русский' : 'English'}</p>
+            <p className="text-xs text-muted-foreground mt-2">{t('language')}: {lang === 'ru' ? 'Русский' : 'English'}</p>
           </div>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-4">
           <div className="flex justify-between items-center mb-3">
-            <h3 className="font-bold text-foreground">👶 {t.baby}</h3>
+            <h3 className="font-bold text-foreground">👶 {t('babyProfile')}</h3>
             <button onClick={() => editing ? handleSaveBaby() : setEditing(true)} className="text-xs font-bold text-primary">
-              {editing ? t.save : (lang === 'ru' ? 'Редактировать' : 'Edit')}
+              {editing ? t('save') : t('edit')}
             </button>
           </div>
           {!baby ? (
@@ -94,9 +94,9 @@ const AccountPage = () => {
                 <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-2xl">👶</div>
               )}
               <div className="text-sm space-y-0.5 text-muted-foreground">
-                <p>{t.name}: <span className="text-foreground font-semibold">{baby.name}</span></p>
-                <p>{t.birth}: <span className="text-foreground">{baby.birthDate}</span></p>
-                <p>{t.gender}: <span className="text-foreground">{baby.gender === 'boy' ? t.boy : baby.gender === 'girl' ? t.girl : '—'}</span></p>
+                <p>{t('name')}: <span className="text-foreground font-semibold">{baby.name}</span></p>
+                <p>{t('birth')}: <span className="text-foreground">{baby.birthDate}</span></p>
+                <p>{t('gender')}: <span className="text-foreground">{baby.gender === 'boy' ? t('boy') : baby.gender === 'girl' ? t('girl') : '—'}</span></p>
               </div>
             </div>
           ) : (
@@ -107,31 +107,31 @@ const AccountPage = () => {
                 </button>
                 <input ref={fileRef} type="file" accept="image/*" onChange={onPhoto} className="hidden" />
               </div>
-              <div><Label>{t.name}</Label><Input value={baby.name} onChange={e => setBaby({ ...baby, name: e.target.value })} /></div>
-              <div><Label>{t.birth}</Label><Input type="date" value={baby.birthDate?.split('T')[0]} onChange={e => setBaby({ ...baby, birthDate: e.target.value })} /></div>
+              <div><Label>{t('name')}</Label><Input value={baby.name} onChange={e => setBaby({ ...baby, name: e.target.value })} /></div>
+              <div><Label>{t('birth')}</Label><Input type="date" value={baby.birthDate?.split('T')[0]} onChange={e => setBaby({ ...baby, birthDate: e.target.value })} /></div>
               <div>
-                <Label>{t.gender}</Label>
+                <Label>{t('gender')}</Label>
                 <div className="flex gap-2 mt-1">
                   {['boy', 'girl'].map(g => (
                     <button key={g} onClick={() => setBaby({ ...baby, gender: g })} className={`flex-1 py-2 rounded-xl text-sm ${baby.gender === g ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                      {g === 'boy' ? t.boy : t.girl}
+                      {g === 'boy' ? t('boy') : t('girl')}
                     </button>
                   ))}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <div><Label>{t.weight}</Label><Input type="number" value={baby.weight || ''} onChange={e => setBaby({ ...baby, weight: e.target.value })} /></div>
-                <div><Label>{t.height}</Label><Input type="number" value={baby.height || ''} onChange={e => setBaby({ ...baby, height: e.target.value })} /></div>
+                <div><Label>{t('weight')}</Label><Input type="number" value={baby.weight || ''} onChange={e => setBaby({ ...baby, weight: e.target.value })} /></div>
+                <div><Label>{t('height')}</Label><Input type="number" value={baby.height || ''} onChange={e => setBaby({ ...baby, height: e.target.value })} /></div>
               </div>
             </div>
           )}
         </div>
 
         <button onClick={() => navigate('/premium')} className="w-full py-3 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold">
-          ⭐ Premium
+          ⭐ {t('premium')}
         </button>
         <button onClick={handleLogout} className="w-full py-3 rounded-2xl border border-destructive text-destructive font-bold">
-          {t.logout}
+          {t('logout')}
         </button>
       </div>
       <BottomNav />
