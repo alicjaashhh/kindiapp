@@ -49,13 +49,20 @@ const BabyInfoPage = () => {
 
       let photo_url: string | null = null;
       if (photoFile) {
-        const ext = photoFile.name.split('.').pop();
-        const path = `${user.id}/${Date.now()}.${ext}`;
-        const { error: upErr } = await supabase.storage.from('baby-photos').upload(path, photoFile, { upsert: true });
-        if (upErr) throw upErr;
-        const { data } = supabase.storage.from('baby-photos').getPublicUrl(path);
-        photo_url = data.publicUrl;
+        try {
+          const ext = photoFile.name.split('.').pop();
+          const path = `${user.id}/${Date.now()}.${ext}`;
+          const { error: upErr } = await supabase.storage.from('baby-photos').upload(path, photoFile, { upsert: true });
+          if (upErr) throw upErr;
+          const { data } = supabase.storage.from('baby-photos').getPublicUrl(path);
+          photo_url = data.publicUrl;
+        } catch (uploadErr: any) {
+          console.error('Photo upload failed:', uploadErr);
+          toast.error('Не удалось загрузить фото, продолжаем без него');
+          photo_url = null;
+        }
       }
+
 
       const { data: baby, error: babyErr } = await supabase.from('babies').insert({
         parent_id: profile!.id,
@@ -103,7 +110,7 @@ const BabyInfoPage = () => {
               </div>
             )}
           </button>
-          <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={onFile} className="hidden" />
+          <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
         </div>
 
         <div>
