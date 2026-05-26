@@ -69,7 +69,7 @@ const HomePage = () => {
     setDayEvents(events);
     const note = events.find(e => e.event_type === 'note');
     setExistingNoteId(note?.id || null);
-    setDayNote(note?.details?.text || '');
+    setDayNote((note?.details as any)?.text || '');
   }, [babyId]);
 
   const handleDayClick = (d: Date) => {
