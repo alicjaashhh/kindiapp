@@ -8,27 +8,19 @@ import PageHeader from '@/components/PageHeader';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getLocalBaby, saveLocalBaby } from '@/lib/baby';
-
-const labels = {
-  ru: { parent: 'Профиль родителя', baby: 'Профиль ребёнка', region: 'Регион', save: 'Сохранить', logout: 'Выйти', name: 'Имя', birth: 'Дата рождения', gender: 'Пол', weight: 'Вес (г)', height: 'Рост (см)', boy: 'Мальчик', girl: 'Девочка', settings: 'Настройки', language: 'Язык' },
-  en: { parent: 'Parent profile', baby: 'Baby profile', region: 'Region', save: 'Save', logout: 'Sign out', name: 'Name', birth: 'Birth date', gender: 'Gender', weight: 'Weight (g)', height: 'Height (cm)', boy: 'Boy', girl: 'Girl', settings: 'Settings', language: 'Language' },
-};
+import { useI18n } from '@/lib/i18n';
 
 const AccountPage = () => {
   const navigate = useNavigate();
+  const { t, lang, region, setRegion } = useI18n();
   const [email, setEmail] = useState('');
-  const [region, setRegion] = useState('cis');
   const [baby, setBaby] = useState<any>(null);
   const [editing, setEditing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const lang = region === 'cis' ? 'ru' : 'en';
-  const t = labels[lang as 'ru' | 'en'];
 
   useEffect(() => {
     setBaby(getLocalBaby());
     supabase.auth.getUser().then(({ data }) => { if (data.user) setEmail(data.user.email || ''); });
-    const r = localStorage.getItem('kindi_region');
-    if (r) setRegion(r);
   }, []);
 
   const handleLogout = async () => {
@@ -39,7 +31,6 @@ const AccountPage = () => {
 
   const handleRegionChange = (r: string) => {
     setRegion(r);
-    localStorage.setItem('kindi_region', r);
     toast.success(r === 'cis' ? 'Регион обновлён' : 'Region updated');
   };
 
