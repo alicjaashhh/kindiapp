@@ -3,23 +3,25 @@ import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import FloatingAnimals from '@/components/FloatingAnimals';
 import PageHeader from '@/components/PageHeader';
-
-const menuItems = [
-  { emoji: '🍎', label: 'Еда', path: '/food' },
-  { emoji: '😴', label: 'Сон', path: '/sleep' },
-  { emoji: '🧸', label: 'Скилы месяца', path: '/skills' },
-  { emoji: '📈', label: 'Скачки роста', path: '/growth' },
-  { emoji: '🦷', label: 'Прорезывание зубов', path: '/teething' },
-  { emoji: '💉', label: 'Вакцинации', path: '/vaccination' },
-];
+import { useI18n } from '@/lib/i18n';
 
 const DevelopmentPage = () => {
   const navigate = useNavigate();
+  const { t } = useI18n();
+
+  const menuItems = [
+    { emoji: '🍎', label: t('food'), path: '/food' },
+    { emoji: '😴', label: t('sleep'), path: '/sleep' },
+    { emoji: '🧸', label: t('skills'), path: '/skills' },
+    { emoji: '📈', label: t('growth'), path: '/growth' },
+    { emoji: '🦷', label: t('teeth'), path: '/teething' },
+    { emoji: '💉', label: t('vaccines'), path: '/vaccination' },
+  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto relative">
       <FloatingAnimals />
-      <PageHeader title="Развитие" showBack={false} />
+      <PageHeader title={t('development')} showBack={false} />
       <div className="px-5 pb-24 space-y-3 relative z-10">
         {menuItems.map((item, i) => (
           <motion.button
