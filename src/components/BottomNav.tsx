@@ -1,17 +1,19 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, BarChart3, ShoppingBag, BookOpen, User } from 'lucide-react';
-
-const tabs = [
-  { icon: Home, label: 'Главная', id: 'home', path: '/home' },
-  { icon: BarChart3, label: 'Развитие', id: 'development', path: '/development' },
-  { icon: ShoppingBag, label: 'Магазин', id: 'shop', path: '/shop' },
-  { icon: BookOpen, label: 'Статьи', id: 'articles', path: '/articles' },
-  { icon: User, label: 'Аккаунт', id: 'account', path: '/account' },
-];
+import { useI18n } from '@/lib/i18n';
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useI18n();
+
+  const tabs = [
+    { icon: Home, label: t('home'), id: 'home', path: '/home' },
+    { icon: BarChart3, label: t('development'), id: 'development', path: '/development' },
+    { icon: ShoppingBag, label: t('shop'), id: 'shop', path: '/shop' },
+    { icon: BookOpen, label: t('articles'), id: 'articles', path: '/articles' },
+    { icon: User, label: t('account'), id: 'account', path: '/account' },
+  ];
 
   const getActiveTab = () => {
     const path = location.pathname;
