@@ -97,6 +97,7 @@ const HomePage = () => {
     });
     if (error) { toast.error(lang === 'ru' ? 'Ошибка' : 'Error'); return; }
     toast.success(lang === 'ru' ? 'Сохранено!' : 'Saved!');
+    loadMonthMarkers();
   };
 
   const saveDayNote = async () => {
