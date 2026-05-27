@@ -47,6 +47,17 @@ const HomePage = () => {
     getBabyId().then(id => setBabyId(id));
   }, []);
 
+  const loadMonthMarkers = useCallback(async () => {
+    if (!babyId) return;
+    const from = format(startOfMonth(currentMonth), 'yyyy-MM-dd');
+    const to = format(endOfMonth(currentMonth), 'yyyy-MM-dd');
+    const { data } = await supabase.from('baby_events').select('event_date').eq('baby_id', babyId).gte('event_date', from).lte('event_date', to);
+    setDatesWithData(new Set((data || []).map((r: any) => r.event_date)));
+  }, [babyId, currentMonth]);
+
+  useEffect(() => { loadMonthMarkers(); }, [loadMonthMarkers]);
+
+
   const birthDate = baby?.birthDate ? new Date(baby.birthDate) : null;
   const babyWeeks = birthDate ? differenceInWeeks(new Date(), birthDate) : 0;
   const babyMonths = birthDate ? differenceInMonths(new Date(), birthDate) : 0;
