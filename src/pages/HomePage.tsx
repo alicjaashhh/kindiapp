@@ -90,13 +90,25 @@ const HomePage = () => {
   };
 
   const saveQuick = async (event_type: string, details: any, date?: Date) => {
-    if (!babyId) { toast.error(lang === 'ru' ? 'Сначала добавьте малыша' : 'Add baby first'); return; }
-    const dateStr = format(date || new Date(), 'yyyy-MM-dd');
+    let id = babyId;
+    if (!id) { id = await getBabyId(); if (id) setBabyId(id); }
+    if (!id) { toast.error(lang === 'ru' ? 'Сначала добавьте малыша' : 'Add baby first'); return; }
+    const target = date || new Date();
+    const dateStr = format(target, 'yyyy-MM-dd');
     const { error } = await supabase.from('baby_events').insert({
-      baby_id: babyId, event_type, event_date: dateStr, details,
+      baby_id: id, event_type, event_date: dateStr, details,
     });
-    if (error) { toast.error(lang === 'ru' ? 'Ошибка' : 'Error'); return; }
+    if (error) { console.error('saveQuick error:', error); toast.error(error.message); return; }
     toast.success(lang === 'ru' ? 'Сохранено!' : 'Saved!');
+    loadMonthMarkers();
+    if (selectedDate && isSameDay(selectedDate, target)) loadDay(selectedDate);
+  };
+
+  const deleteEvent = async (id: string) => {
+    const { error } = await supabase.from('baby_events').delete().eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success(lang === 'ru' ? 'Удалено' : 'Deleted');
+    if (selectedDate) loadDay(selectedDate);
     loadMonthMarkers();
   };
 
@@ -105,17 +117,29 @@ const HomePage = () => {
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
     if (existingNoteId) {
       const { error } = await supabase.from('baby_events').update({ details: { text: dayNote } }).eq('id', existingNoteId);
-      if (error) { toast.error('Error'); return; }
+      if (error) { toast.error(error.message); return; }
     } else {
       const { data, error } = await supabase.from('baby_events').insert({
         baby_id: babyId, event_type: 'note', event_date: dateStr, details: { text: dayNote },
       }).select().single();
-      if (error) { toast.error('Error'); return; }
+      if (error) { toast.error(error.message); return; }
       setExistingNoteId(data.id);
     }
     toast.success(lang === 'ru' ? 'Заметка сохранена' : 'Note saved');
     loadDay(selectedDate);
     loadMonthMarkers();
+  };
+
+  const [addType, setAddType] = useState<string | null>(null);
+  const [addVal, setAddVal] = useState<any>({});
+  const submitAddForDate = async () => {
+    if (!selectedDate || !addType) return;
+    let details: any = {};
+    if (addType === 'behavior') details = { mood: addVal.mood };
+    if (addType === 'teeth') details = { count: Number(addVal.count || 0) };
+    if (addType === 'growth') details = { weight: addVal.weight ? Number(addVal.weight) : undefined, height: addVal.height ? Number(addVal.height) : undefined };
+    await saveQuick(addType, details, selectedDate);
+    setAddType(null); setAddVal({});
   };
 
   const mainEvents = dayEvents.filter(e => MAIN_TYPES.includes(e.event_type));
