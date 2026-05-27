@@ -26,6 +26,7 @@ const HomePage = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [baby, setBaby] = useState<any>(null);
   const [babyId, setBabyId] = useState<string | null>(null);
+  const [datesWithData, setDatesWithData] = useState<Set<string>>(new Set());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dayEvents, setDayEvents] = useState<any[]>([]);
   const [dayNote, setDayNote] = useState('');
@@ -45,6 +46,17 @@ const HomePage = () => {
     setBaby(getLocalBaby());
     getBabyId().then(id => setBabyId(id));
   }, []);
+
+  const loadMonthMarkers = useCallback(async () => {
+    if (!babyId) return;
+    const from = format(startOfMonth(currentMonth), 'yyyy-MM-dd');
+    const to = format(endOfMonth(currentMonth), 'yyyy-MM-dd');
+    const { data } = await supabase.from('baby_events').select('event_date').eq('baby_id', babyId).gte('event_date', from).lte('event_date', to);
+    setDatesWithData(new Set((data || []).map((r: any) => r.event_date)));
+  }, [babyId, currentMonth]);
+
+  useEffect(() => { loadMonthMarkers(); }, [loadMonthMarkers]);
+
 
   const birthDate = baby?.birthDate ? new Date(baby.birthDate) : null;
   const babyWeeks = birthDate ? differenceInWeeks(new Date(), birthDate) : 0;
@@ -85,6 +97,7 @@ const HomePage = () => {
     });
     if (error) { toast.error(lang === 'ru' ? 'Ошибка' : 'Error'); return; }
     toast.success(lang === 'ru' ? 'Сохранено!' : 'Saved!');
+    loadMonthMarkers();
   };
 
   const saveDayNote = async () => {
@@ -102,6 +115,7 @@ const HomePage = () => {
     }
     toast.success(lang === 'ru' ? 'Заметка сохранена' : 'Note saved');
     loadDay(selectedDate);
+    loadMonthMarkers();
   };
 
   const mainEvents = dayEvents.filter(e => MAIN_TYPES.includes(e.event_type));
@@ -171,6 +185,7 @@ const HomePage = () => {
             const today = isToday(day);
             const birthday = isBirthday(day);
             const isFuture = day > new Date();
+            const hasData = datesWithData.has(format(day, 'yyyy-MM-dd'));
             return (
               <button key={day.toISOString()} onClick={() => !isFuture && handleDayClick(day)} disabled={isFuture}
                 className="flex flex-col items-center disabled:opacity-30 relative">
@@ -183,7 +198,10 @@ const HomePage = () => {
                 }`}>
                   {birthday ? '🎂' : format(day, 'd')}
                 </div>
-                {spurt && !birthday && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-0.5" />}
+                <div className="flex gap-0.5 mt-0.5 h-1.5">
+                  {spurt && !birthday && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                  {hasData && <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
+                </div>
               </button>
             );
           })}
@@ -221,7 +239,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="mt-5 px-5 pb-24 relative z-10">
+      <div className="mt-5 px-5 relative z-10">
         <h2 className="font-bold text-foreground mb-3">{t('recommendations')}</h2>
         <div className="space-y-3">
           <div className="bg-card rounded-2xl p-4 border border-border">
@@ -234,6 +252,33 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+
+      {/* You might like — gifts by age in weeks */}
+      <div className="mt-5 px-5 pb-24 relative z-10">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-bold text-foreground">{lang === 'ru' ? 'Вам может это понравиться' : 'You might like this'}</h2>
+          <button onClick={() => navigate('/gifts')} className="text-xs text-primary font-semibold">{lang === 'ru' ? 'Все →' : 'All →'}</button>
+        </div>
+        <div className="flex gap-3 overflow-x-auto -mx-5 px-5 pb-2 scrollbar-hide">
+          {(() => {
+            const w = babyWeeks;
+            const items = w < 26
+              ? [{ e: '🎠', n: lang === 'ru' ? 'Мобиль на кроватку' : 'Crib mobile' }, { e: '🧵', n: lang === 'ru' ? 'Набор пелёнок' : 'Swaddle set' }, { e: '🍩', n: lang === 'ru' ? 'Погремушка-грызунок' : 'Teething rattle' }]
+              : w < 52
+              ? [{ e: '📖', n: lang === 'ru' ? 'Интерактивная книжка' : 'Interactive book' }, { e: '🚗', n: lang === 'ru' ? 'Каталка-ходунки' : 'Walker' }, { e: '🪆', n: lang === 'ru' ? 'Неваляшка' : 'Roly-poly toy' }]
+              : w < 104
+              ? [{ e: '🔶', n: lang === 'ru' ? 'Сортер' : 'Shape sorter' }, { e: '🏎️', n: lang === 'ru' ? 'Машинка' : 'Toy car' }, { e: '🏠', n: lang === 'ru' ? 'Кукольный домик' : 'Doll house' }]
+              : [{ e: '🧱', n: lang === 'ru' ? 'Конструктор' : 'Building blocks' }, { e: '🎨', n: lang === 'ru' ? 'Набор для рисования' : 'Art set' }, { e: '🚲', n: lang === 'ru' ? 'Велосипед' : 'Bicycle' }];
+            return items.map(i => (
+              <button key={i.n} onClick={() => navigate('/gifts')} className="min-w-[130px] bg-card border border-border rounded-2xl p-3 flex-shrink-0 text-center">
+                <span className="text-3xl">{i.e}</span>
+                <p className="font-semibold text-xs mt-2">{i.n}</p>
+              </button>
+            ));
+          })()}
+        </div>
+      </div>
+
 
       {/* Day events dialog with 3 sections */}
       <Dialog open={!!selectedDate} onOpenChange={(v) => !v && setSelectedDate(null)}>
