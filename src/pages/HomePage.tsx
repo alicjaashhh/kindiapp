@@ -90,13 +90,25 @@ const HomePage = () => {
   };
 
   const saveQuick = async (event_type: string, details: any, date?: Date) => {
-    if (!babyId) { toast.error(lang === 'ru' ? 'Сначала добавьте малыша' : 'Add baby first'); return; }
-    const dateStr = format(date || new Date(), 'yyyy-MM-dd');
+    let id = babyId;
+    if (!id) { id = await getBabyId(); if (id) setBabyId(id); }
+    if (!id) { toast.error(lang === 'ru' ? 'Сначала добавьте малыша' : 'Add baby first'); return; }
+    const target = date || new Date();
+    const dateStr = format(target, 'yyyy-MM-dd');
     const { error } = await supabase.from('baby_events').insert({
-      baby_id: babyId, event_type, event_date: dateStr, details,
+      baby_id: id, event_type, event_date: dateStr, details,
     });
-    if (error) { toast.error(lang === 'ru' ? 'Ошибка' : 'Error'); return; }
+    if (error) { console.error('saveQuick error:', error); toast.error(error.message); return; }
     toast.success(lang === 'ru' ? 'Сохранено!' : 'Saved!');
+    loadMonthMarkers();
+    if (selectedDate && isSameDay(selectedDate, target)) loadDay(selectedDate);
+  };
+
+  const deleteEvent = async (id: string) => {
+    const { error } = await supabase.from('baby_events').delete().eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    toast.success(lang === 'ru' ? 'Удалено' : 'Deleted');
+    if (selectedDate) loadDay(selectedDate);
     loadMonthMarkers();
   };
 
@@ -105,17 +117,29 @@ const HomePage = () => {
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
     if (existingNoteId) {
       const { error } = await supabase.from('baby_events').update({ details: { text: dayNote } }).eq('id', existingNoteId);
-      if (error) { toast.error('Error'); return; }
+      if (error) { toast.error(error.message); return; }
     } else {
       const { data, error } = await supabase.from('baby_events').insert({
         baby_id: babyId, event_type: 'note', event_date: dateStr, details: { text: dayNote },
       }).select().single();
-      if (error) { toast.error('Error'); return; }
+      if (error) { toast.error(error.message); return; }
       setExistingNoteId(data.id);
     }
     toast.success(lang === 'ru' ? 'Заметка сохранена' : 'Note saved');
     loadDay(selectedDate);
     loadMonthMarkers();
+  };
+
+  const [addType, setAddType] = useState<string | null>(null);
+  const [addVal, setAddVal] = useState<any>({});
+  const submitAddForDate = async () => {
+    if (!selectedDate || !addType) return;
+    let details: any = {};
+    if (addType === 'behavior') details = { mood: addVal.mood };
+    if (addType === 'teeth') details = { count: Number(addVal.count || 0) };
+    if (addType === 'growth') details = { weight: addVal.weight ? Number(addVal.weight) : undefined, height: addVal.height ? Number(addVal.height) : undefined };
+    await saveQuick(addType, details, selectedDate);
+    setAddType(null); setAddVal({});
   };
 
   const mainEvents = dayEvents.filter(e => MAIN_TYPES.includes(e.event_type));
@@ -292,6 +316,38 @@ const HomePage = () => {
           </DialogHeader>
 
           <div className="space-y-4">
+            {/* Add data for this date */}
+            <section className="bg-muted/50 rounded-xl p-3">
+              <h4 className="text-xs font-bold text-foreground mb-2">{lang === 'ru' ? 'Добавить запись на этот день' : 'Add record for this day'}</h4>
+              <div className="flex gap-2 flex-wrap">
+                {['behavior','teeth','growth'].map(k => (
+                  <button key={k} onClick={() => { setAddType(k); setAddVal({}); }}
+                    className={`px-3 py-1.5 rounded-lg text-xs ${addType === k ? 'bg-primary text-primary-foreground' : 'bg-background border border-border'}`}>
+                    {typeIcon[k]} {typeLabel[k]}
+                  </button>
+                ))}
+              </div>
+              {addType === 'behavior' && (
+                <div className="mt-2 grid grid-cols-3 gap-1.5">
+                  {(lang === 'ru' ? ['😊 Активный','😢 Капризный','😴 Спокойный','🤒 Болеет','😋 Голодный','🥰 Игривый'] : ['😊 Active','😢 Fussy','😴 Calm','🤒 Sick','😋 Hungry','🥰 Playful']).map(b => (
+                    <button key={b} onClick={() => setAddVal({ mood: b })} className={`p-2 rounded-lg text-xs ${addVal.mood === b ? 'bg-primary text-primary-foreground' : 'bg-background'}`}>{b}</button>
+                  ))}
+                </div>
+              )}
+              {addType === 'teeth' && (
+                <Input type="number" className="mt-2" placeholder="0" value={addVal.count || ''} onChange={e => setAddVal({ count: e.target.value })} />
+              )}
+              {addType === 'growth' && (
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <Input type="number" placeholder={t('weight')} value={addVal.weight || ''} onChange={e => setAddVal({ ...addVal, weight: e.target.value })} />
+                  <Input type="number" placeholder={t('height')} value={addVal.height || ''} onChange={e => setAddVal({ ...addVal, height: e.target.value })} />
+                </div>
+              )}
+              {addType && (
+                <button onClick={submitAddForDate} className="mt-2 w-full py-2 rounded-lg bg-primary text-primary-foreground font-bold text-xs">{t('save')}</button>
+              )}
+            </section>
+
             {/* MAIN */}
             <section>
               <h4 className="text-sm font-bold text-foreground mb-2">1. {t('main')}</h4>
@@ -300,12 +356,13 @@ const HomePage = () => {
               ) : (
                 <div className="space-y-2">
                   {mainEvents.map(e => (
-                    <div key={e.id} className="bg-muted rounded-xl p-2.5 text-sm flex gap-2">
+                    <div key={e.id} className="bg-muted rounded-xl p-2.5 text-sm flex gap-2 items-start">
                       <span>{typeIcon[e.event_type]}</span>
-                      <div>
+                      <div className="flex-1">
                         <p className="font-semibold text-xs">{typeLabel[e.event_type]}</p>
                         <p className="text-xs text-muted-foreground">{renderDetails(e)}</p>
                       </div>
+                      <button onClick={() => deleteEvent(e.id)} className="text-xs text-red-500">✕</button>
                     </div>
                   ))}
                 </div>
@@ -320,12 +377,13 @@ const HomePage = () => {
               ) : (
                 <div className="space-y-2">
                   {additionalEvents.map(e => (
-                    <div key={e.id} className="bg-muted rounded-xl p-2.5 text-sm flex gap-2">
+                    <div key={e.id} className="bg-muted rounded-xl p-2.5 text-sm flex gap-2 items-start">
                       <span>{typeIcon[e.event_type]}</span>
-                      <div>
+                      <div className="flex-1">
                         <p className="font-semibold text-xs">{typeLabel[e.event_type]}</p>
                         <p className="text-xs text-muted-foreground">{renderDetails(e)}</p>
                       </div>
+                      <button onClick={() => deleteEvent(e.id)} className="text-xs text-red-500">✕</button>
                     </div>
                   ))}
                 </div>
