@@ -185,6 +185,7 @@ const HomePage = () => {
             const today = isToday(day);
             const birthday = isBirthday(day);
             const isFuture = day > new Date();
+            const hasData = datesWithData.has(format(day, 'yyyy-MM-dd'));
             return (
               <button key={day.toISOString()} onClick={() => !isFuture && handleDayClick(day)} disabled={isFuture}
                 className="flex flex-col items-center disabled:opacity-30 relative">
@@ -197,7 +198,10 @@ const HomePage = () => {
                 }`}>
                   {birthday ? '🎂' : format(day, 'd')}
                 </div>
-                {spurt && !birthday && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-0.5" />}
+                <div className="flex gap-0.5 mt-0.5 h-1.5">
+                  {spurt && !birthday && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                  {hasData && <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
+                </div>
               </button>
             );
           })}
