@@ -115,6 +115,7 @@ const HomePage = () => {
     }
     toast.success(lang === 'ru' ? 'Заметка сохранена' : 'Note saved');
     loadDay(selectedDate);
+    loadMonthMarkers();
   };
 
   const mainEvents = dayEvents.filter(e => MAIN_TYPES.includes(e.event_type));
