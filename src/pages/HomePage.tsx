@@ -26,6 +26,7 @@ const HomePage = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [baby, setBaby] = useState<any>(null);
   const [babyId, setBabyId] = useState<string | null>(null);
+  const [datesWithData, setDatesWithData] = useState<Set<string>>(new Set());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dayEvents, setDayEvents] = useState<any[]>([]);
   const [dayNote, setDayNote] = useState('');
